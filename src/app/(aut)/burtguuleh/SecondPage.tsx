@@ -40,9 +40,8 @@ const FirstPage = ({ next }: { next: () => void }) => {
   }
   return (
     <div className="w-[60%] m-auto h-screen flex flex-col">
-      <div className="w-[700px] p-14 flex items-end justify-end ">
-        <ButtonSecondary />
-      </div>
+
+
       <div className="flex flex-col m-auto p-6 items-start justify-center gap-2.5">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -97,6 +96,10 @@ const FirstPage = ({ next }: { next: () => void }) => {
             </Button>
           </form>
         </Form>
+        <div>
+          <ButtonSecondary />
+
+        </div>
       </div>
     </div>
   );

@@ -1,11 +1,11 @@
-import DashboardProfile from "./_Components/DashboardProfile";
-import DropDownMenu from "./_Components/DropDownMenu";
+import React from 'react'
 
-export default function Home() {
+
+const Page = () => {
   return (
-    <div className="flex">
-      <DropDownMenu />
-      <DashboardProfile />
+    <div>
+
     </div>
-  );
+  )
 }
+export default Page
