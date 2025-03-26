@@ -2,14 +2,13 @@
 import {
   Form,
   FormControl,
-
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { z } from "zod";
@@ -17,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { ButtonSecondary } from "@/components/signup";
-import { CoffeeType } from "../../../../utils/Types";
+import { useUser } from "@/app/_Context/userContext";
 
 const formSchema = z.object({
   userName: z.string().min(2, {
@@ -26,12 +25,9 @@ const formSchema = z.object({
 });
 
 const FirstPage = ({ next }: { next: () => void }) => {
-  const [data, setData] = useState<CoffeeType[] | null>(null)
-  useEffect(() => {
-    fetch("/api/coffee").then((data) => data.json()).then((json) => setData(json.data))
-  }, [])
-  console.log(data);
-  console.log("next :>> ", next);
+  const { callData } = useUser();
+
+  console.log("object :>> ", callData);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,7 +35,15 @@ const FirstPage = ({ next }: { next: () => void }) => {
     },
   });
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const foundUser = callData?.find(
+      (hereglegch) => hereglegch.username !== values.userName
+    );
+    if (foundUser) {
+      console.log("adilhan nertein bn neree soli");
+      return;
+    }
+    console.log("Aan boljiino nerchin");
+    next();
   }
   return (
     <div className="w-[60%] m-auto h-screen flex flex-col">
@@ -64,19 +68,16 @@ const FirstPage = ({ next }: { next: () => void }) => {
                 </FormItem>
               )}
             />
-            <Button onClick={() => next()} className="w-[355px]" type="submit">
+            <Button className="w-[355px]" type="submit">
               Submit
             </Button>
-            {data && data[0].username}
-
+            {callData && callData[0].username}
           </form>
         </Form>
-        <div >
+        <div>
           <ButtonSecondary />
         </div>
-
       </div>
-
     </div>
   );
 };

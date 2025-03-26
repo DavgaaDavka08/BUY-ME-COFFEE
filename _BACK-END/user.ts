@@ -1,4 +1,4 @@
-import { CoffeeType } from "../utils/Types";
+import CoffeeType from "../utils/Types";
 
 const User = async (): Promise<CoffeeType[]> => {
   return [
@@ -7,6 +7,10 @@ const User = async (): Promise<CoffeeType[]> => {
       username: "davgaa",
       email: "dagaa@gmail.com",
       password: "1234",
+      name: "davgaa",
+      about: "hello world",
+      socialMediaURL: "http",
+      backgroundImage: "",
     },
   ];
 };

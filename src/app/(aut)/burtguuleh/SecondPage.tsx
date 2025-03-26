@@ -18,6 +18,10 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { ButtonSecondary } from "@/components/signup";
 
+import { useRouter } from "next/navigation";
+
+import { useUser } from "@/app/_Context/userContext";
+
 const formSchema = z.object({
   email: z.string().min(2, {
     message: "Username must be at least 2 characters.",
@@ -26,8 +30,10 @@ const formSchema = z.object({
     message: "Username must be at least 2 characters.",
   }),
 });
-const FirstPage = ({ next }: { next: () => void }) => {
-  console.log("next :>> ", next);
+const FirstPage = () => {
+  const router = useRouter();
+  const { callData } = useUser();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,13 +41,22 @@ const FirstPage = ({ next }: { next: () => void }) => {
       password: "",
     },
   });
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const FindEmail = callData?.find(
+      (hereglegch) => hereglegch.email !== values.email
+    );
+    if (FindEmail) {
+      console.log("email davhtssan bolomjgui", FindEmail);
+      router.push("/burtguuleh");
+      return;
+    }
+    console.log("boljiiinee");
+    router.push("/nevtreh");
   }
+
   return (
     <div className="w-[60%] m-auto h-screen flex flex-col">
-
-
       <div className="flex flex-col m-auto p-6 items-start justify-center gap-2.5">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -91,14 +106,14 @@ const FirstPage = ({ next }: { next: () => void }) => {
                 </FormItem>
               )}
             />
-            <Button onClick={() => next()} className="w-[355px]" type="submit">
+            <Button className="w-[355px]" type="submit">
               Submit
             </Button>
+            {callData && callData[0].email}
           </form>
         </Form>
         <div>
           <ButtonSecondary />
-
         </div>
       </div>
     </div>
