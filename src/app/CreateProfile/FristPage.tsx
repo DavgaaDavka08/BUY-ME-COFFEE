@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,15 +14,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useUser } from "../_Context/userContext";
+import CoffeeType from "../../../utils/Types";
 
-const UPLOAD_PRESET = "coffee";
+const UPLOAD_PRESET = "food";
 const CLOUD_NAME = "748589482997997";
 
-const uploadImage = async (file: File | null): Promise<string | null> => {
-  if (!file) return null;
+const uploadImage = async (file: File | null) => {
+  if (!file) {
+    return null;
+  }
 
   const formData = new FormData();
   formData.append("file", file);
@@ -37,31 +38,34 @@ const uploadImage = async (file: File | null): Promise<string | null> => {
         body: formData,
       }
     );
-
-    if (!response.ok) {
-      throw new Error("Failed to upload image");
-    }
-
     const result = await response.json();
+
     return result.secure_url;
-  } catch (error) {
-    console.error("Upload error:", error);
-    return null;
+  } catch (error: unknown) {
+    return { "failed to upload image": error };
   }
 };
 
 const formSchema = z.object({
   name: z.string().min(2, "Хамгийн багадаа 2 үсэгтэй байх ёстой"),
-  image: z.string().nonempty("Зургаа оруулна уу"),
+  image: z.string().nonempty("Zuragaa oruulna uu"),
   about: z.string().min(2, "Хамгийн багадаа 2 үсэгтэй байх ёстой"),
   urL: z.string().nonempty("link оруулна уу"),
 });
 
-export default function FirstPage() {
-  const route = useRouter();
+export default function FirstPage({ next }: { next: () => void }) {
   const [foodImageFile, setFoodImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>();
-
+  const [callData, setCallData] = useState<CoffeeType[] | null>(null);
+  useEffect(() => {
+    fetch("/api/coffee")
+      .then((res) => res.json())
+      .then((json) => {
+        console.log(json);
+        setCallData(json.data);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -73,23 +77,25 @@ export default function FirstPage() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+    const file = e.target.files![0];
     setFoodImageFile(file);
-
     const tempImageUrl = URL.createObjectURL(file);
     setPreviewUrl(tempImageUrl);
+    form.setValue("image", "uploaded");
   };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const imageUrl = await uploadImage(foodImageFile);
-    if (!imageUrl) {
+    if (!imageUrl || typeof imageUrl !== "string") {
       form.setError("image", { message: "Зургийг хуулж чадсангүй" });
       return;
     }
-    console.log("values :>> ", values);
-    route.push("/secondPage");
+    const updatedValues = { ...values, image: imageUrl };
+    console.log("Updated values:", updatedValues);
+    form.setValue("image", imageUrl);
+    setFoodImageFile(null);
+    setPreviewUrl("");
+    form.setValue("image", "");
+    next();
   };
 
   return (
@@ -97,23 +103,23 @@ export default function FirstPage() {
       <div className="max-w-[510px]  h-[631px] flex flex-col gap-5">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* Image Upload */}
             <FormField
               control={form.control}
               name="image"
-              render={({ fieldState }) => (
+              render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Complete your profile page</FormLabel>
-                  <FormDescription>Add a photo</FormDescription>
+                  <FormLabel>Image</FormLabel>
                   <FormControl>
                     <Input
+                      placeholder="image"
                       type="file"
-                      className="w-[160px] h-[160px] rounded-full justify-center items-center border-2 border-dashed border-gray-300"
-                      accept="image/*"
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleChange(e);
+                      }}
                     />
                   </FormControl>
-                  <FormMessage>{fieldState.error?.message}</FormMessage>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -174,15 +180,10 @@ export default function FirstPage() {
         </Form>
         {previewUrl && (
           <div className="border">
-            <Image
-              width={192}
-              height={192}
-              className="size-48 object-cover rounded-md"
-              src={previewUrl}
-              alt="Preview"
-            />
+            <img className="size-48 object-cover" src={previewUrl} alt="" />
           </div>
         )}
+        {callData && callData[0].name}
       </div>
     </div>
   );

@@ -1,23 +1,19 @@
-"use client"
-import { useState } from "react"
-
-import { SecondPage } from "./SecondPage"
-import { LastPage } from "./LastPage"
-import FristPage from "./FristPage"
-
-
+"use client";
+import React, { useState } from "react";
+import FirstPage from "./FristPage";
+import { SecondPage } from "./SecondPage";
 
 const Page = () => {
-    const [chnagePage, setChangePage] = useState<number>(0)
-    console.log('setChangePage :>> ', setChangePage);
-    const Controller = [FristPage, SecondPage, LastPage][chnagePage]
-    const nextPage = (() => {
-        setChangePage(chnagePage + 1)
-    })
-    return (
-        <div>
-            <Controller nextPage={nextPage} />
-        </div>
-    )
-}
-export default Page
+  const [changePage, setChangePage] = useState<number>(0);
+  const FormStep = [FirstPage, SecondPage][changePage];
+  const next = () => {
+    setChangePage(changePage + 1);
+  };
+  return (
+    <div>
+      <FormStep next={next} />
+    </div>
+  );
+};
+
+export default Page;

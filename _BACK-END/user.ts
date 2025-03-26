@@ -9,7 +9,9 @@ const User = async (): Promise<CoffeeType[]> => {
       password: "1234",
       name: "davgaa",
       about: "hello world",
-      socialMediaURL: "http",
+      socialMediaURL: "http://localhost:3000/api/coffee",
+      avatarImage: "/Users/24LP1757/Desktop/coffee.jpg",
+      successMessage: "amjilttai",
       backgroundImage: "",
     },
   ];

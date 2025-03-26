@@ -7,5 +7,8 @@ type CoffeeType = {
   about: string;
   socialMediaURL: string;
   backgroundImage: string;
+  avatarImage: string;
+
+  successMessage: string;
 };
 export default CoffeeType;
