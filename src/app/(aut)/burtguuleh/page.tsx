@@ -9,6 +9,7 @@ const Page = () => {
   const next = () => {
     setChangePage(changePage + 1);
   };
+
   return (
     <div>
       <FormStep next={next} />
