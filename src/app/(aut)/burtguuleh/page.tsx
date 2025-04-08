@@ -1,20 +1,21 @@
 "use client";
-import React, { useState } from "react";
+
+import { useState } from "react";
 import FirstPage from "./FirstPage";
-import SecondPage from "./SecondPage";
+import Second from "./SecondPage";
 
-const Page = () => {
-  const [changePage, setChangePage] = useState<number>(0);
-  const FormStep = [FirstPage, SecondPage][changePage];
-  const next = () => {
-    setChangePage(changePage + 1);
+export default function Page() {
+  const [current, setCurrent] = useState(0);
+  const [user, setUser] = useState("");
+  const Form = [FirstPage, Second][current];
+  console.log("Form :>> ", Form);
+  const changepage = () => {
+    setCurrent(current + 1);
   };
-
+  console.log("changepage :>> ", changepage);
   return (
     <div>
-      <FormStep next={next} />
+      {!user ? <FirstPage setUser={setUser} /> : <Second user={user} />}
     </div>
   );
-};
-
-export default Page;
+}

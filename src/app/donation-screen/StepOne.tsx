@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Heart } from "lucide-react";
-import { useUser } from "../_Context/userContext";
 
 import Image from "next/image";
 
@@ -21,8 +20,6 @@ const StepOne = ({ next }: { next: () => void }) => {
   const handleBack = () => {
     setShowQRCode(false);
   };
-
-  const { callData } = useUser();
 
   return (
     <div className="w-full min-h-screen bg-white">
@@ -44,9 +41,7 @@ const StepOne = ({ next }: { next: () => void }) => {
                   <div className="w-[50px] h-[50px] bg-gray-200 rounded-full flex items-center justify-center">
                     <span className="text-gray-500">J</span>
                   </div>
-                  <p className="text-xl font-medium">
-                    {callData && callData[0].name}
-                  </p>
+                  <p className="text-xl font-medium"></p>
                 </div>
                 <Button variant="outline" size="sm">
                   Edit page
@@ -54,11 +49,9 @@ const StepOne = ({ next }: { next: () => void }) => {
               </div>
 
               <div className="flex flex-col w-full gap-2">
-                <h3 className="font-medium">
-                  About {callData && callData[0].name}
-                </h3>
+                <h3 className="font-medium">About</h3>
                 <div className="p-4 rounded-lg bg-[#F4F4F5]">
-                  <p> {callData && callData[0].name}</p>
+                  <p> </p>
                 </div>
               </div>
             </div>
@@ -66,7 +59,7 @@ const StepOne = ({ next }: { next: () => void }) => {
             {/* Social Media URL Card */}
             <div className="flex p-6 flex-col items-start gap-3 rounded-2xl border bg-white">
               <h3 className="font-medium">Social media URL</h3>
-              <p className="text-blue-600"> {callData && callData[0].name}</p>
+              <p className="text-blue-600"> </p>
             </div>
 
             {/* Recent Supporters Card */}
@@ -76,9 +69,7 @@ const StepOne = ({ next }: { next: () => void }) => {
                 <div className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100">
                   <Heart className="h-6 w-6 text-gray-400" />
                 </div>
-                <p className="text-gray-600">
-                  Be the first one to support {callData && callData[0].name}
-                </p>
+                <p className="text-gray-600">Be the first one to support</p>
               </div>
             </div>
           </div>

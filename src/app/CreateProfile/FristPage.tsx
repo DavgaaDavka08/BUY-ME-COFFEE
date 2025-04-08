@@ -1,14 +1,10 @@
 "use client";
-
 import type React from "react";
-
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Camera } from "lucide-react";
-
 import {
   Form,
   FormControl,
@@ -20,10 +16,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import type CoffeeType from "../../../utils/Types";
-
-const UPLOAD_PRESET = "food";
-const CLOUD_NAME = "748589482997997";
+import { useState } from "react";
+const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_NAME!;
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -34,53 +29,15 @@ const formSchema = z.object({
 export default function ProfileForm({ next }: { next: () => void }) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [callData, setCallData] = useState<CoffeeType[] | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  console.log("loading :>> ", loading);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("/api/coffee");
-
-        if (!res.ok) {
-          throw new Error(`API responded with status: ${res.status}`);
-        }
-
-        const contentType = res.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          return;
-          throw new Error("API did not return JSON");
-        }
-
-        const json = await res.json();
-        setCallData(json.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        // Set callData to an empty array instead of null to avoid errors
-        setCallData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Only fetch if we're in a browser environment
-    if (typeof window !== "undefined") {
-      fetchData();
-    } else {
-      setLoading(false);
-    }
-  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: (callData && callData[0]?.name) || "",
-      about: (callData && callData[0]?.about) || "",
-      socialMediaURL: (callData && callData[0]?.socialMediaURL) || "",
+      name: "",
+      about: "",
+      socialMediaURL: "",
     },
   });
-
   const uploadImage = async (file: File | null) => {
     if (!file) {
       return null;
@@ -88,7 +45,6 @@ export default function ProfileForm({ next }: { next: () => void }) {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", UPLOAD_PRESET);
-
     try {
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
@@ -98,13 +54,13 @@ export default function ProfileForm({ next }: { next: () => void }) {
         }
       );
       const result = await response.json();
+      console.log("zuraggg !!!!!!!!!!!!!! :>> ", response);
       return result.secure_url;
     } catch (error: unknown) {
       console.error("Failed to upload image:", error);
       return null;
     }
   };
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -113,17 +69,19 @@ export default function ProfileForm({ next }: { next: () => void }) {
       setPreviewUrl(tempImageUrl);
     }
   };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const imageUrl = await uploadImage(imageFile);
     const updatedValues = { ...values, image: imageUrl };
     console.log("Updated values:", updatedValues);
     setImageFile(null);
     setPreviewUrl(null);
-    next();
+    if (next) {
+      next();
+    } else {
+      console.error("next function is not provided");
+    }
     return;
   };
-
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-[510px] bg-white rounded-lg p-6 space-y-6">
@@ -216,7 +174,6 @@ export default function ProfileForm({ next }: { next: () => void }) {
                 </FormItem>
               )}
             />
-
             <div className="pt-4">
               <Button type="submit" className="w-full h-12 rounded-md">
                 Continue

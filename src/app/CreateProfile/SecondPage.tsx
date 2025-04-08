@@ -13,8 +13,6 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SelectScrollable } from "@/components/my-shadchn/selectcreateprofile";
-import { useUser } from "../_Context/userContext";
 
 const formSchema = z.object({
   firstName: z
@@ -33,7 +31,6 @@ const formSchema = z.object({
 });
 
 const SecondPage = () => {
-  const { callData } = useUser();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -63,15 +60,10 @@ const SecondPage = () => {
             <FormField
               control={form.control}
               name="selectCountry"
-              render={({ field }) => (
+              render={({}) => (
                 <FormItem>
                   <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <SelectScrollable
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
+                  <FormControl></FormControl>
                   <FormMessage />
                 </FormItem>
               )}

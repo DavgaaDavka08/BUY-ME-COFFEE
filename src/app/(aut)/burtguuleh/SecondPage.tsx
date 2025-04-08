@@ -1,4 +1,6 @@
 "use client";
+
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -8,51 +10,68 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
-import React from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-import { z } from "zod";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
-import { ButtonSecondary } from "@/components/signup";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-
-import { useUser } from "@/app/_Context/userContext";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import CoffeeType from "../../../../utils/Types";
 
 const formSchema = z.object({
-  email: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  email: z.string().min(3, {
+    message: "Email must be at least 3 characters.",
   }),
-  password: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  password: z.string().min(3, {
+    message: "Password must be at least 3 characters.",
+  }),
+  username: z.string().min(3, {
+    message: "Username must be at least 3 characters.",
   }),
 });
-const FirstPage = () => {
-  const router = useRouter();
-  const { callData } = useUser();
 
+export default function Second({ user }: { user: string }) {
+  const [postDatas, setPostDatas] = useState<CoffeeType[]>([]);
+  console.log("postDatas :>> ", postDatas);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
+      username: user,
     },
   });
+  const router = useRouter();
+
+  const PostData = async ({
+    values,
+  }: {
+    values: { email: string; password: string; username: string };
+  }) => {
+    try {
+      const postData = await fetch("/api/burtguuleh", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      const getJson = await postData.json();
+      console.log("Response from server:", getJson);
+      if (getJson?.postData) {
+        setPostDatas(getJson.postData);
+      }
+      // PostData(values.email, values.password, values.username);
+      router.push("/nevtreh");
+    } catch (error) {
+      console.log("Error during signup:", error);
+    }
+  };
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const FindEmail = callData?.find(
-      (hereglegch) => hereglegch.email !== values.email
-    );
-    if (FindEmail) {
-      console.log("email davhtssan bolomjgui", FindEmail);
-      router.push("/burtguuleh");
-      return;
-    }
-    console.log("boljiiinee");
-    router.push("/nevtreh");
+    console.log("Form values:", values);
+    PostData({ values });
   }
 
   return (
@@ -109,15 +128,9 @@ const FirstPage = () => {
             <Button className="w-[355px]" type="submit">
               Submit
             </Button>
-            {callData && callData[0].email}
           </form>
         </Form>
-        <div>
-          <ButtonSecondary />
-        </div>
       </div>
     </div>
   );
-};
-
-export default FirstPage;
+}

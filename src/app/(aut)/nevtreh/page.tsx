@@ -7,10 +7,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
 import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,25 +16,31 @@ import { useForm } from "react-hook-form";
 
 import { useRouter } from "next/navigation";
 import CoffeeType from "../../../../utils/Types";
+import axios from "axios";
 
 const formSchema = z.object({
   email: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+    message: "Email must be at least 2 characters.",
   }),
   password: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+    message: "Password must be at least 2 characters.",
   }),
 });
+
 const FirstPage = () => {
   const router = useRouter();
-  const [user, setUser] = useState<CoffeeType[]>();
+  const [user, setUser] = useState<CoffeeType[]>([]);
+  console.log("user :>> ", user);
   useEffect(() => {
-    fetch("api/coffee")
-      .then((res) => res.json())
-      .then((json) => {
-        console.log("object :>> ", json);
-        setUser(json.data);
-      });
+    async function fetchUsers() {
+      try {
+        const response = await axios.post("http://localhost:3000/api/nevtreh");
+        setUser(response.data || []);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    }
+    fetchUsers();
   }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,17 +51,17 @@ const FirstPage = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const FindEmail = user?.find(
-      (hereglegch) => hereglegch.email !== values.email
-    );
-    if (FindEmail) {
-      console.log("email davhtssan bolomjgui", FindEmail);
-
-      return;
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const response = await axios.post("/api/nevtreh", {
+        email: values.email,
+        password: values.password,
+      });
+      console.log("response :>> ", response);
+      router.push("/CreateProfile");
+    } catch (error) {
+      console.log("ERROR in nevtreh", error);
     }
-    console.log("boljiiinee");
-    router.push("/CreateProfile");
   }
 
   return (
@@ -71,46 +75,41 @@ const FirstPage = () => {
               render={({ field }) => (
                 <FormItem className="gap-4">
                   <FormLabel className="text-[24px]">Welcome back</FormLabel>
-
-                  <FormLabel className="text-[16px]">email</FormLabel>
+                  <FormLabel className="text-[16px]">Email</FormLabel>
                   <FormControl>
                     <Input
                       className="w-[355px]"
-                      placeholder="shadcn"
+                      placeholder="you@example.com"
                       {...field}
                     />
                   </FormControl>
-
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </form>
-        </Form>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
             <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem className="gap-4">
-                  <FormLabel className="text-[16px]">password</FormLabel>
+                  <FormLabel className="text-[16px]">Password</FormLabel>
                   <FormControl>
                     <Input
+                      type="password"
                       className="w-[355px]"
-                      placeholder="shadcn"
+                      placeholder="••••••"
                       {...field}
                     />
                   </FormControl>
-
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <Button className="w-[355px]" type="submit">
               Submit
             </Button>
-            {user && user[0].email}
           </form>
         </Form>
       </div>
