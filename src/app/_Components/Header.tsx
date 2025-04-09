@@ -1,4 +1,4 @@
-import { ModeToggle } from "@/components/toggle";
+
 import Image from "next/image";
 import React from "react";
 
@@ -13,7 +13,7 @@ const Header = () => {
       </div>
       <div>
         <div>
-          <ModeToggle />
+
         </div>
       </div>
       <div className="flex gap-2 items-center">

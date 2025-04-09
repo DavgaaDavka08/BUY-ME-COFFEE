@@ -21,11 +21,7 @@ const formSchema = z.object({
     message: "Username must be at least 2 characters.",
   }),
 });
-const FirstPage = ({
-  setUser,
-}: {
-  setUser: Dispatch<SetStateAction<string>>;
-}) => {
+const FirstPage = ({ setUser, }: { setUser: Dispatch<SetStateAction<string>>; }) => {
   const [posts, setPosts] = useState<CoffeeType[]>([]);
   console.log("posts :>> ", posts);
   const form = useForm<z.infer<typeof formSchema>>({

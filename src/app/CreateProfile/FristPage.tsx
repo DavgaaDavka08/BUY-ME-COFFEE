@@ -5,7 +5,7 @@ import type React from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import Image from "next/image";
 import { Camera } from "lucide-react";
 
@@ -32,7 +32,14 @@ const formSchema = z.object({
   avatarImage: z.string().url("avatar img"),
 });
 
-export default function Firstpage({ next }: { next: () => void }) {
+export default function Firstpage({
+  setUser,
+  changepage,
+}: {
+  setUser: Dispatch<SetStateAction<string>>;
+  changepage: () => void;
+}) {
+  console.log('setUser :>> ', setUser);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [postDatas, setPostDatas] = useState<CoffeeType[]>([]);
@@ -106,13 +113,15 @@ export default function Firstpage({ next }: { next: () => void }) {
       }
 
       if (postData) {
-        next();
+
       }
       setImageFile(null);
       setPreviewUrl(null);
       const getJson = await postData.json();
       console.log("ddd", getJson);
       setPostDatas(getJson.postData || []);
+      setUser(values.name);
+      changepage();
     } catch (error) {
       console.log("error", error);
     }

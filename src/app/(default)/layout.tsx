@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import DropDownMenu from "./_Components/DropDownMenu";
+import Header from "../_Components/Header";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -13,15 +14,14 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang="en">
             <head />
             <body>
+                <Header />
                 <div className="flex" >
                     <DropDownMenu />
                     {children}
-
                 </div>
-
             </body>
         </html>
     );

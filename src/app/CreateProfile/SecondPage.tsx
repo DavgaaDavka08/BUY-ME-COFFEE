@@ -1,5 +1,4 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,9 +10,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
+import { useState } from "react";
+import CoffeeType from "../../../utils/Types";
+import { useRouter } from "next/navigation";
 const formSchema = z.object({
   firstName: z
     .string()
@@ -30,7 +41,10 @@ const formSchema = z.object({
   selectCountry: z.string().min(1, { message: "Please select a country" }),
 });
 
-const SecondPage = () => {
+const SecondPage = ({ user }: { user: string }) => {
+  const [postDatas, setPostDatas] = useState<CoffeeType[]>([]);
+  console.log('postDatas :>> ', postDatas);
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,9 +57,43 @@ const SecondPage = () => {
       selectCountry: "",
     },
   });
+  const PostData = async ({
+    values,
+  }: {
+    values: { firstname: string; lastname: string; country: string; cardnumber: string; expirydate: string; userid: string };
+  }) => {
+    try {
+      const postData = await fetch("/api/banckcards", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      const getJson = await postData.json();
+      console.log("Response from server:", getJson);
+      if (getJson?.postData) {
+        setPostDatas(getJson.postData);
+      }
+      // PostData(values.email, values.password, values.username);
+      router.push("/default");
+    } catch (error) {
+      console.log("Error during signup:", error);
+    }
+  };
+
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    console.log("Form values:", values);
+    const formattedValues = {
+      firstname: values.firstName,
+      lastname: values.lastName,
+      cardnumber: values.cardNumber,
+      country: values.selectCountry,
+      expirydate: `${values.month}/${values.year}`,
+      userid: user,
+    }
+    PostData({ values: formattedValues });
   }
 
   return (
@@ -56,14 +104,29 @@ const SecondPage = () => {
         </h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Country Selection */}
+            <FormLabel>Country</FormLabel>
+
             <FormField
               control={form.control}
               name="selectCountry"
-              render={({}) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Country</FormLabel>
-                  <FormControl></FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-[448px] h-[24px] px-2 py-3 justify-center items-center gap-4">
+                      <SelectValue placeholder="Select Country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>City</SelectLabel>
+                        <SelectItem value="Mongulia">Mongulia</SelectItem>
+                        <SelectItem value="Japen">Japen</SelectItem>
+                        <SelectItem value="Koreo">Koreo</SelectItem>
+                        <SelectItem value="United-State">United-State</SelectItem>
+                        <SelectItem value="Australia">Australia</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -98,7 +161,6 @@ const SecondPage = () => {
                 )}
               />
             </div>
-
             {/* Card Number */}
             <FormField
               control={form.control}
@@ -117,7 +179,6 @@ const SecondPage = () => {
                 </FormItem>
               )}
             />
-
             {/* Expiry Date & CVC */}
             <div className="flex gap-4">
               {/* Month */}
