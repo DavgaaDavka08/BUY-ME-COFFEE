@@ -1,10 +1,14 @@
 "use client";
+
 import type React from "react";
+
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import Image from "next/image";
 import { Camera } from "lucide-react";
+
 import {
   Form,
   FormControl,
@@ -16,7 +20,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import CoffeeType from "../../../utils/Types";
+
 const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_NAME!;
 
@@ -24,20 +29,24 @@ const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   about: z.string().min(2, "About must be at least 2 characters"),
   socialMediaURL: z.string().url("Please enter a valid URL"),
+  avatarImage: z.string().url("avatar img"),
 });
 
-export default function ProfileForm({ next }: { next: () => void }) {
+export default function Firstpage({ next }: { next: () => void }) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
+  const [postDatas, setPostDatas] = useState<CoffeeType[]>([]);
+  console.log("postDatas :>> ", postDatas);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       about: "",
+      avatarImage: "",
       socialMediaURL: "",
     },
   });
+
   const uploadImage = async (file: File | null) => {
     if (!file) {
       return null;
@@ -45,6 +54,7 @@ export default function ProfileForm({ next }: { next: () => void }) {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", UPLOAD_PRESET);
+
     try {
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
@@ -54,34 +64,60 @@ export default function ProfileForm({ next }: { next: () => void }) {
         }
       );
       const result = await response.json();
-      console.log("zuraggg !!!!!!!!!!!!!! :>> ", response);
+      console.log("result  !!!!!!!!!!!!!!!!:>> ", result);
       return result.secure_url;
     } catch (error: unknown) {
       console.error("Failed to upload image:", error);
       return null;
     }
   };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImageFile(file);
       const tempImageUrl = URL.createObjectURL(file);
+      form.setValue("avatarImage", tempImageUrl);
       setPreviewUrl(tempImageUrl);
     }
   };
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("Form submitted", values); // Check if this is logged when submitting the form
     const imageUrl = await uploadImage(imageFile);
-    const updatedValues = { ...values, image: imageUrl };
-    console.log("Updated values:", updatedValues);
-    setImageFile(null);
-    setPreviewUrl(null);
-    if (next) {
-      next();
-    } else {
-      console.error("next function is not provided");
+    if (!imageUrl) {
+      console.error("Image upload failed");
+      return;
     }
-    return;
-  };
+
+    const updatedValues = { ...values, avatarimage: imageUrl };
+    try {
+      const postData = await fetch("/api/Createprofile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedValues),
+      });
+
+      if (!postData.ok) {
+        console.error("API call failed", postData);
+        return;
+      }
+
+      if (postData) {
+        next();
+      }
+      setImageFile(null);
+      setPreviewUrl(null);
+      const getJson = await postData.json();
+      console.log("ddd", getJson);
+      setPostDatas(getJson.postData || []);
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-[510px] bg-white rounded-lg p-6 space-y-6">
@@ -174,6 +210,7 @@ export default function ProfileForm({ next }: { next: () => void }) {
                 </FormItem>
               )}
             />
+
             <div className="pt-4">
               <Button type="submit" className="w-full h-12 rounded-md">
                 Continue
