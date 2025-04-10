@@ -21,7 +21,11 @@ const formSchema = z.object({
     message: "Username must be at least 2 characters.",
   }),
 });
-const FirstPage = ({ setUser, }: { setUser: Dispatch<SetStateAction<string>>; }) => {
+const FirstPage = ({
+  setUser,
+}: {
+  setUser: Dispatch<SetStateAction<string>>;
+}) => {
   const [posts, setPosts] = useState<CoffeeType[]>([]);
   console.log("posts :>> ", posts);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,6 +50,7 @@ const FirstPage = ({ setUser, }: { setUser: Dispatch<SetStateAction<string>>; })
   }, []);
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("object :>> ", values);
+    console.log(localStorage.getItem("userId"));
     setUser(values.userName);
     return;
   }

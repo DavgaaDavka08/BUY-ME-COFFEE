@@ -21,17 +21,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import CoffeeType from "../../../utils/Types";
-
 const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!;
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_NAME!;
-
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   about: z.string().min(2, "About must be at least 2 characters"),
   socialMediaURL: z.string().url("Please enter a valid URL"),
   avatarImage: z.string().url("avatar img"),
 });
-
 export default function Firstpage({
   setUser,
   changepage,
@@ -39,10 +36,11 @@ export default function Firstpage({
   setUser: Dispatch<SetStateAction<string>>;
   changepage: () => void;
 }) {
-  console.log('setUser :>> ', setUser);
+  console.log("setUser :>> ", setUser);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [postDatas, setPostDatas] = useState<CoffeeType[]>([]);
+  const userId = localStorage.getItem("userId");
   console.log("postDatas :>> ", postDatas);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -97,7 +95,7 @@ export default function Firstpage({
       return;
     }
 
-    const updatedValues = { ...values, avatarimage: imageUrl };
+    const updatedValues = { ...values, avatarimage: imageUrl, id: userId };
     try {
       const postData = await fetch("/api/Createprofile", {
         method: "POST",
@@ -113,7 +111,6 @@ export default function Firstpage({
       }
 
       if (postData) {
-
       }
       setImageFile(null);
       setPreviewUrl(null);

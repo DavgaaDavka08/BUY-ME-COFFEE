@@ -59,9 +59,11 @@ export default function Second({ user }: { user: string }) {
       });
       const getJson = await postData.json();
       console.log("Response from server:", getJson);
+      console.log(getJson.user.id);
       if (getJson?.postData) {
         setPostDatas(getJson.postData);
       }
+      localStorage.setItem("userId", getJson.user.id);
       // PostData(values.email, values.password, values.username);
       router.push("/nevtreh");
     } catch (error) {
