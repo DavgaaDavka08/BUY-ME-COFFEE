@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import UserProvider from "./_Context/getCreateProfile";
+import UserProviders from "./_Context/getUser";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +17,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body>
-        <UserProvider>{children}</UserProvider>
+        <UserProviders>
+          <UserProvider>{children}</UserProvider>
+        </UserProviders>
+
       </body>
     </html>
   );

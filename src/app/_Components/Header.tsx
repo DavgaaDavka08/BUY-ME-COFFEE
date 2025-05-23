@@ -1,8 +1,9 @@
-
+"use client"
 import Image from "next/image";
 import React from "react";
-
+import { useUsers } from "../_Context/getUser";
 const Header = () => {
+  const { callUser } = useUsers()
   return (
     <div className="w-[90%] h-[110px] m-auto py-5  px-2 flex justify-between items-center">
       <div className="flex gap-2 items-center ">
@@ -18,6 +19,7 @@ const Header = () => {
       </div>
       <div className="flex gap-2 items-center">
         <Image alt="" src="/avatar.svg" width={30} height={30} />
+        {callUser && callUser[0].username}
       </div>
     </div>
   );

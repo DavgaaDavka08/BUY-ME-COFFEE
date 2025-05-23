@@ -9,9 +9,7 @@ const StepTwo = ({ back }: { back: () => void }) => {
         <div className="bg-green-500 rounded-full p-4 mb-4">
           <Check className="h-8 w-8 text-white" />
         </div>
-
         <h1 className="text-2xl font-bold mb-8">Donation Complete !</h1>
-
         <div className="w-full border border-dashed border-blue-200 rounded-lg p-4 mb-8">
           <div className="flex items-center gap-2 mb-2">
             <div className="relative h-10 w-10 rounded-full overflow-hidden">

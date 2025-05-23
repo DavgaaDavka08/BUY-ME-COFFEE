@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { runQuery } from "../../../../utils/qeuryService";
-
+interface User {
+  id: number;
+  email: string;
+  password: string;
+}
 export async function POST(req: Request): Promise<NextResponse> {
   try {
     const { email, password } = await req.json();
@@ -20,7 +24,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         { status: 401 }
       );
     }
-    const user = result[0];
+    const user = result[0] as User;
     const isValidPassword = user.password === password;
     if (!isValidPassword) {
       return NextResponse.json(

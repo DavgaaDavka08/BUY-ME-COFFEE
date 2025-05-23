@@ -1,29 +1,29 @@
 "use client";
-
 import { useUser } from "@/app/_Context/getCreateProfile";
+import { useUsers } from "@/app/_Context/getUser";
 import { ButtonDemo } from "@/components/buttun";
 import { SelectDemo } from "@/components/my-shadchn/selegtdashboard";
-
 import Image from "next/image";
 import React from "react";
-
 const DashboardProfile = () => {
   const { callData } = useUser();
+  const { callUser } = useUsers()
   console.log("object :>> ", callData);
+  console.log('callUser !!!!!!!!!!:>> ', callUser);
   return (
     <div className="w-[67%] h-screen m-auto ">
       <div className="w-[100%] h-[220px] flex py-4 px-9 justify-between flex-col items-start gap-6 rounded-2xl bg-white border">
         <div className="w-[100%]  flex justify-between items-center">
           <div className="flex gap-3">
-            {/* <Image
+            <Image
               alt=""
-              src={`${callData && callData[0].avatarImage}`}
+              src="/avatarImage"
               width={50}
               height={50}
-            /> */}
+            />
             <div className="flex flex-col justify-center items-start">
-              <p>{callData && callData[0].username}</p>
-              <p></p>
+              <p>{callData && callData[0].name}</p>
+              <p>{callUser && callUser[0].email}</p>
             </div>
           </div>
           <div>

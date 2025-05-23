@@ -8,7 +8,6 @@ import React, {
   useEffect,
   useState,
 } from "react";
-
 // Ensure the context type allows `undefined`
 type UserContextType = {
   callData: CoffeeType[] | null;
